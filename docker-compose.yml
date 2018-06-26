@@ -8,9 +8,10 @@ services:
     volumes:
       - db:/var/lib/mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_ROOT_PASSWORD=
     env_file:
       - db.env
+      - .env
   adminer:
     image: adminer
 
@@ -26,13 +27,14 @@ services:
       - MYSQL_HOST=db
     env_file:
       - db.env
+      - .env
     depends_on:
       - db
     networks:
       - proxy-tier
       - default
-#  elasticsearch:
-#    image: "elasticsearch:latest"
+  elasticsearch:
+    build: ./elasticsearch
 
   proxy:
     build: ./proxy
