@@ -37,7 +37,7 @@ services:
 
   portainer:
     image: portainer/portainer
-    container-name: portainer
+    container_name: portainer
     command: --admin-password ${PORTAINER_PASSWORD_HASH}
     restart: always
     volumes:
@@ -71,7 +71,8 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
       - proxy-tier
-    letsencrypt-companion:
+
+  letsencrypt-companion:
      image: jrcs/letsencrypt-nginx-proxy-companion
      restart: always
      volumes:
@@ -87,9 +88,10 @@ services:
 volumes:
   db:
   nextcloud:
-    certs:
+  certs:
   vhost.d:
   html:
+  portainer_data:
 
 networks:
   proxy-tier:
