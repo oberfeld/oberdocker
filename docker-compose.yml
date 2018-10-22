@@ -7,8 +7,6 @@ services:
     restart: always
     volumes:
       - db:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=
     env_file:
       - db.env
       - .env
@@ -23,8 +21,8 @@ services:
       - nextcloud:/var/www/html
     environment:
       - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST}
-      - LETSENCRYPT_HOST=
-      - LETSENCRYPT_EMAIL=
+      - LETSENCRYPT_HOST=gruenbox.oberfeld.be
+      - LETSENCRYPT_EMAIL=it@oberfeld.be
       - MYSQL_HOST=db
     env_file:
       - db.env
@@ -53,8 +51,9 @@ services:
       - proxy-tier
       - default
 
-  elasticsearch:
-    build: ./elasticsearch
+# Funktioniert aktuell nicht...
+#  elasticsearch:
+#    build: ./elasticsearch
 
   proxy:
     build: ./proxy
