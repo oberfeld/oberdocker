@@ -1,6 +1,12 @@
 FROM nextcloud:apache
 
-RUN wget -q https://github.com/nextcloud/calendar/releases/download/v1.5.3/calendar.tar.gz -P /var/www/nextcloud/apps
-RUN tar -zxf /var/www/nextcloud/apps/calendar.tar.gz -C /var/www/nextcloud/apps
-RUN rm /var/www/nextcloud/apps/calendar.tar.gz
-RUN sudo -u www-data php /var/www/nextcloud/occ app:enable calendar
+RUN apt-get update && apt-get install -y \
+    supervisor \
+  && rm -rf /var/lib/apt/lists/* \
+  && mkdir /var/log/supervisord /var/run/supervisord
+
+COPY supervisord.conf /etc/supervisor/supervisord.conf
+
+ENV NEXTCLOUD_UPDATE=1
+
+CMD ["/usr/bin/supervisord"]
