@@ -47,11 +47,8 @@ services:
       - LETSENCRYPT_EMAIL=it@oberfeld.be
     env_file:
       - .env
-    ports:
-      - 9000:9000
     networks:
       - proxy-tier
-      - default
 
 # Funktioniert aktuell nicht...
 #  elasticsearch:
@@ -61,7 +58,7 @@ services:
     build: ./proxy
     restart: always
     ports:
-      - 8080:80
+      - 80:80
       - 443:443
     labels:
       com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
