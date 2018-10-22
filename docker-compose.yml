@@ -12,6 +12,7 @@ services:
     env_file:
       - db.env
       - .env
+
   adminer:
     image: adminer
 
@@ -33,6 +34,25 @@ services:
     networks:
       - proxy-tier
       - default
+
+  portainer:
+    image: portainer/portainer
+    container-name: portainer
+    command: --admin-password ${PORTAINER_PASSWORD_HASH}
+    restart: always
+    volumes:
+      - portainer_data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - VIRTUAL_HOST=${PORTAINER_VIRTUAL_HOST} 
+    env_file:
+      - .env
+    ports:
+      - 9000:9000
+    networks:
+      - proxy-tier
+      - default
+
   elasticsearch:
     build: ./elasticsearch
 
@@ -51,7 +71,7 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
       - proxy-tier
-   letsencrypt-companion:
+    letsencrypt-companion:
      image: jrcs/letsencrypt-nginx-proxy-companion
      restart: always
      volumes:
@@ -63,6 +83,7 @@ services:
        - proxy-tier
      depends_on:
        - proxy
+
 volumes:
   db:
   nextcloud:
