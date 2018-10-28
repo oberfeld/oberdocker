@@ -17,6 +17,8 @@ services:
       - VIRTUAL_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
+    networks:
+      - proxy-tier
 
   nextcloud:  
     build: ./nextcloud
