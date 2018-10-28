@@ -19,6 +19,7 @@ services:
       - LETSENCRYPT_EMAIL=it@oberfeld.be
     networks:
       - proxy-tier
+      - default
 
   nextcloud:  
     build: ./nextcloud
