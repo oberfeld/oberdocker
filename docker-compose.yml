@@ -13,6 +13,10 @@ services:
 
   adminer:
     image: adminer
+    environment:
+      - VIRTUAL_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
+      - LETSENCRYPT_EMAIL=it@oberfeld.be
 
   nextcloud:  
     build: ./nextcloud
