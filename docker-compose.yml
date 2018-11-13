@@ -12,7 +12,7 @@ services:
       - .env
 
   adminer:
-    image: adminer
+    image: adminer:4.6.3
     environment:
       - VIRTUAL_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${ADMINER_MARIA_LETSENCRYPT_HOST}
@@ -57,9 +57,23 @@ services:
     networks:
       - proxy-tier
 
-# Funktioniert aktuell nicht...
-#  elasticsearch:
-#    build: ./elasticsearch
+  elasticsearch:
+    build: ./elasticsearch
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - cluster.name=gree-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms5120m -Xmx5120m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    networks:
+      - proxy-tier
+      - default
 
   proxy:
     build: ./proxy
@@ -97,6 +111,7 @@ volumes:
   vhost.d:
   html:
   portainer_data:
+  esdata:
 
 networks:
   proxy-tier:
