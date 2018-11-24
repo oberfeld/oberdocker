@@ -62,9 +62,9 @@ services:
     container_name: elasticsearch
     restart: always
     environment:
-      - cluster.name=gree-cluster
+      - cluster.name=green-cluster
       - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms5120m -Xmx5120m"
+      - "ES_JAVA_OPTS=-Xms${ELASTICSEARCH_MEM_IN_MB}m -Xmx${ELASTICSEARCH_MEM_IN_MB}m"
     ulimits:
       memlock:
         soft: -1
