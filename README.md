@@ -13,6 +13,7 @@ This setup consist of the following containers:
 
 ## Manual interaction when installing:
 
+### .env File
 create `.env` file with the following content (values need to be changed accordingly)
 ```ini
 #if "true", will fetch certs from letsencrypt. Use "false" locally 
@@ -42,8 +43,22 @@ PORTAINER_PASSWORD_HASH=$2y$05$ksEgrHIJdw1gR5ZySLafDeWH2NIHl20rkva9r4oK54goI/yT1
 
 #Max memory for elasticsearch process. Need to be high in prod (>10)
 ELASTICSEARCH_MEM_IN_MB=1000
-```
 
+#Password used to encrypt the backup
+BACKUP_PASSWORD=very secure password
+#Target where the backup should be saved to (duplicity option)
+BACKUP_TARGET=scp://backuphost
+
+```
+### Auth keys for Backup
+The SSH key that are used to authenticate the user at the backup target host
+need to placed in `./keys/id_rsa`.
+You can use the command
+```bash
+$> mkdir key && ssh_keygen -f key/id_rsa -N ""
+``` 
+
+### Plugins for Nextcloud
 Install the following Apps in nextcloud
 - Full text search
 - Full text search - Elasticsearch Platform
