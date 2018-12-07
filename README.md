@@ -47,7 +47,7 @@ ELASTICSEARCH_MEM_IN_MB=1000
 #Password used to encrypt the backup
 BACKUP_PASSWORD=very secure password
 #Target where the backup should be saved to (duplicity option)
-BACKUP_TARGET=scp://backuphost
+BACKUP_TARGET=pexpect+scp://backuphost
 
 ```
 ### Auth keys for Backup
@@ -55,8 +55,9 @@ The SSH key that are used to authenticate the user at the backup target host
 need to placed in `./keys/id_rsa`.
 You can use the command
 ```bash
-$> mkdir key && ssh_keygen -f key/id_rsa -N ""
+$> mkdir keys && ssh-keygen -f keys/id-rsa -N ""
 ``` 
+Then copy the content of the file `./keys/id_rsa.pub` to the backup-target's file `.ssh/authorized_keys`.
 
 ### Plugins for Nextcloud
 Install the following Apps in nextcloud
