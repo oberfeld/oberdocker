@@ -106,6 +106,7 @@ services:
       - proxy-tier
     depends_on:
       - proxy
+
   volumerize:
     container_name: volumerize
     build: ./volumerize
@@ -122,6 +123,7 @@ services:
       - db:/source/db:ro  
       - nextcloud:/source/nextcloud:ro
       - ./keys:/keys
+
 volumes:
   db:
   nextcloud:
