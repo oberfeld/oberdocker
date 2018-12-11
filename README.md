@@ -70,7 +70,7 @@ The SSH key that are used to authenticate the user at the backup target host
 need to placed in `./keys/id_rsa`.
 You can use the command
 ```bash
-$> mkdir keys && ssh-keygen -f keys/id-rsa -N ""
+$> mkdir keys && ssh-keygen -f keys/id_rsa -N ""
 ``` 
 Then copy the content of the file `./keys/id_rsa.pub` to the backup-target's file `.ssh/authorized_keys`.
 
