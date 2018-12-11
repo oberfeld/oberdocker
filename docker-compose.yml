@@ -29,6 +29,7 @@ services:
     volumes:
       - nextcloud:/var/www/html
     environment:
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_VIRTUAL_HOST}
       - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${NEXTCLOUD_LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
