@@ -13,6 +13,22 @@ This setup consist of the following containers:
 
 ## Manual interaction when installing:
 
+### (local only) set host names
+To be able to access the different application you need to choose different domains for this, as 
+the proxy redirect based on the hostname used to call the request.
+
+On linux and mac, you may add those hosts in the `/etc/hosts` file, such as 
+```
+127.0.0.1   localhost
+127.0.0.1   greenbox
+127.0.0.1   portainer
+127.0.0.1   adminer
+```
+### (local only) set vm.max_map_count
+elasticsearch needs vm.max_map_count to be set to a min of 262144
+see here [https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html]
+
+### .env File
 create `.env` file with the following content (values need to be changed accordingly)
 ```ini
 #if "true", will fetch certs from letsencrypt. Use "false" locally 
@@ -42,8 +58,23 @@ PORTAINER_PASSWORD_HASH=$2y$05$ksEgrHIJdw1gR5ZySLafDeWH2NIHl20rkva9r4oK54goI/yT1
 
 #Max memory for elasticsearch process. Need to be high in prod (>10)
 ELASTICSEARCH_MEM_IN_MB=1000
-```
 
+#Password used to encrypt the backup
+BACKUP_PASSWORD=very secure password
+#Target where the backup should be saved to (duplicity option)
+BACKUP_TARGET=pexpect+scp://backuphost
+
+```
+### Auth keys for Backup
+The SSH key that are used to authenticate the user at the backup target host
+need to placed in `./keys/id_rsa`.
+You can use the command
+```bash
+$> mkdir keys && ssh-keygen -f keys/id_rsa -N ""
+``` 
+Then copy the content of the file `./keys/id_rsa.pub` to the backup-target's file `.ssh/authorized_keys`.
+
+### Plugins for Nextcloud
 Install the following Apps in nextcloud
 - Full text search
 - Full text search - Elasticsearch Platform

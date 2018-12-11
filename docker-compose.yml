@@ -3,8 +3,9 @@ version: '3'
 services:
   db:
     image: mariadb
+    container_name: db
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
-    restart: always
+    restart: unless-stopped
     volumes:
       - db:/var/lib/mysql
     env_file:
@@ -22,11 +23,13 @@ services:
       - default
 
   nextcloud:  
+    container_name: nextcloud
     build: ./nextcloud
-    restart: always
+    restart: unless-stopped
     volumes:
       - nextcloud:/var/www/html
     environment:
+      - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_VIRTUAL_HOST}
       - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${NEXTCLOUD_LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
@@ -92,17 +95,34 @@ services:
       - proxy-tier
 
   letsencrypt-companion:
-     image: jrcs/letsencrypt-nginx-proxy-companion
-     restart: always
-     volumes:
-       - certs:/etc/nginx/certs
-       - vhost.d:/etc/nginx/vhost.d
-       - html:/usr/share/nginx/html
-       - /var/run/docker.sock:/var/run/docker.sock:ro
-     networks:
-       - proxy-tier
-     depends_on:
-       - proxy
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    volumes:
+      - certs:/etc/nginx/certs
+      - vhost.d:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy-tier
+    depends_on:
+      - proxy
+
+  volumerize:
+    container_name: volumerize
+    build: ./volumerize
+    environment:
+      - VOLUMERIZE_SOURCE=/source
+      - VOLUMERIZE_TARGET=${BACKUP_TARGET}
+      - VOLUMERIZE_JOBBER_TIME=0 0 3 * * *
+      - VOLUMERIZE_CONTAINERS=db nextcloud
+      - PASSPHRASE=${BACKUP_PASSWORD}
+      - VOLUMERIZE_FULL_IF_OLDER_THAN=1M
+      - TZ=Europe/Berlin
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - db:/source/db:ro  
+      - nextcloud:/source/nextcloud:ro
+      - ./keys:/keys
 
 volumes:
   db:
