@@ -24,7 +24,7 @@ On linux and mac, you may add those hosts in the `/etc/hosts` file, such as
 127.0.0.1   portainer
 127.0.0.1   adminer
 ```
-### (local only) set vm.max_map_count
+### set vm.max_map_count
 elasticsearch needs vm.max_map_count to be set to a min of 262144
 see here [https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html]
 

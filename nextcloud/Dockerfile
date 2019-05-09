@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 
-RUN echo "1 1 * * * php /var/www/html/occ fulltextsearch:index" >> /var/spool/cron/crontabs/www-data
+RUN echo "1 4 * * * php /var/www/html/occ fulltextsearch:index" >> /var/spool/cron/crontabs/www-data
 
 ENV NEXTCLOUD_UPDATE=1
 
