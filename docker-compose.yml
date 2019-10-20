@@ -11,9 +11,12 @@ services:
     env_file:
       - db.env
       - .env
+    networks:
+      - default
 
   adminer:
     image: adminer:4.6.3
+    container_name: adminer
     environment:
       - VIRTUAL_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${ADMINER_MARIA_LETSENCRYPT_HOST}
@@ -67,7 +70,13 @@ services:
     environment:
       - cluster.name=green-cluster
       - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - index.number_of_shards=1
+      - index.number_of_replicas=0
       - "ES_JAVA_OPTS=-Xms${ELASTICSEARCH_MEM_IN_MB}m -Xmx${ELASTICSEARCH_MEM_IN_MB}m"
+    ports:
+      - 9200:9200
+      - 9300:9300
     ulimits:
       memlock:
         soft: -1
@@ -75,11 +84,11 @@ services:
     volumes:
       - esdata:/usr/share/elasticsearch/data
     networks:
-      - proxy-tier
       - default
 
   proxy:
     build: ./proxy
+    container_name: proxy
     restart: always
     ports:
       - 80:80
@@ -118,11 +127,14 @@ services:
       - PASSPHRASE=${BACKUP_PASSWORD}
       - VOLUMERIZE_FULL_IF_OLDER_THAN=1M
       - TZ=Europe/Berlin
+      - AWS_ACCESS_KEY_ID=    ${BACKUP_AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
+      - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive-
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - db:/source/db:ro  
       - nextcloud:/source/nextcloud:ro
-      - ./keys:/keys
+#      - ./keys:/keys
 
 volumes:
   db:
