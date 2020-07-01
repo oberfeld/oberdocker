@@ -39,7 +39,7 @@ MYSQL_ROOT_PASSWORD=my_root_pwd
 MYSQL_PASSWORD=my_pwd
 
 #DNS name for nextcloud
-NEXTCLOUD_VIRTUAL_HOST=greenbox.oberfeld.be
+NEXTCLOUD_VIRTUAL_HOST=chischte.oberfeld.be
 #DNS name for nextcloud. Use it empty locally
 NEXTCLOUD_LETSENCRYPT_HOST=
 #Password for admin user (will only be considered the first time nextcloud is installed)
