@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  adminer:
+    image: adminer:4.6.3
+    environment:
+      - VIRTUAL_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${ADMINER_MARIA_LETSENCRYPT_HOST}
+      - LETSENCRYPT_EMAIL=it@oberfeld.be
+    networks:
+      - proxy-tier
+      - default
