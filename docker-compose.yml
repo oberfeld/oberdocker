@@ -3,40 +3,34 @@ version: '3'
 services:
   db:
     image: mariadb
-    container_name: db
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
     volumes:
       - db:/var/lib/mysql
-    env_file:
-      - db.env
-      - .env
-
-  adminer:
-    image: adminer:4.6.3
     environment:
-      - VIRTUAL_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
-      - LETSENCRYPT_HOST=${ADMINER_MARIA_LETSENCRYPT_HOST}
-      - LETSENCRYPT_EMAIL=it@oberfeld.be
+      - MYSQL_ROOT_PASSWORD
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
     networks:
-      - proxy-tier
       - default
 
-  nextcloud:  
-    container_name: nextcloud
+  nextcloud:
     build: ./nextcloud
     restart: unless-stopped
     volumes:
       - nextcloud:/var/www/html
     environment:
       - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_VIRTUAL_HOST}
+      - NEXTCLOUD_ADMIN_USER
+      - NEXTCLOUD_ADMIN_PASSWORD
       - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${NEXTCLOUD_LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
       - MYSQL_HOST=db
-    env_file:
-      - db.env
-      - .env
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
     depends_on:
       - db
     networks:
@@ -45,7 +39,6 @@ services:
 
   portainer:
     image: portainer/portainer
-    container_name: portainer
     command: --admin-password ${PORTAINER_PASSWORD_HASH}
     restart: always
     volumes:
@@ -55,37 +48,16 @@ services:
       - VIRTUAL_HOST=${PORTAINER_VIRTUAL_HOST} 
       - LETSENCRYPT_HOST=${PORTAINER_LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
-    env_file:
-      - .env
+      - PORTAINER_PASSWORD_HASH
     networks:
       - proxy-tier
-
-  elasticsearch:
-    build: ./elasticsearch
-    container_name: elasticsearch
-    restart: always
-    environment:
-      - cluster.name=green-cluster
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms${ELASTICSEARCH_MEM_IN_MB}m -Xmx${ELASTICSEARCH_MEM_IN_MB}m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
-    networks:
-      - proxy-tier
-      - default
 
   proxy:
     build: ./proxy
     restart: always
     ports:
-      - 80:80
-      - 443:443
-    labels:
-      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: ${USE_LETSENCRYPT}
+      - ${PORT_HTTP:-80}:80
+      - ${PORT_HTTPS:-443}:443
     volumes:
       - certs:/etc/nginx/certs:ro
       - vhost.d:/etc/nginx/vhost.d
@@ -94,36 +66,6 @@ services:
     networks:
       - proxy-tier
 
-  letsencrypt-companion:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    restart: always
-    volumes:
-      - certs:/etc/nginx/certs
-      - vhost.d:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - proxy-tier
-    depends_on:
-      - proxy
-
-  volumerize:
-    container_name: volumerize
-    build: ./volumerize
-    environment:
-      - VOLUMERIZE_SOURCE=/source
-      - VOLUMERIZE_TARGET=${BACKUP_TARGET}
-      - VOLUMERIZE_JOBBER_TIME=0 0 3 * * *
-      - VOLUMERIZE_CONTAINERS=db nextcloud
-      - PASSPHRASE=${BACKUP_PASSWORD}
-      - VOLUMERIZE_FULL_IF_OLDER_THAN=1M
-      - TZ=Europe/Berlin
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - db:/source/db:ro  
-      - nextcloud:/source/nextcloud:ro
-      - ./keys:/keys
-
 volumes:
   db:
   nextcloud:
@@ -131,8 +73,7 @@ volumes:
   vhost.d:
   html:
   portainer_data:
-  esdata:
 
 networks:
   proxy-tier:
-   
+  default:

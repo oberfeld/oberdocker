@@ -2,14 +2,30 @@
 
 ## Containers
 
-This setup consist of the following containers:
+This docker-compose setup consist of the following containers:
 - nextcloud: The container running the nextcloud app
 - db: MariaDb container to store nextclouds data 
 - elasticsearch: The container running the elasticsearch index for the fulltextsearch
 - proxy: Ngin-X server to automatically route different domains/virtual host to the corresponding container ips
+- adminer: GUI for the db
 - letsencrypt-companion: companion for proxy to download certificates for https encryptions
-- adminer: admin gui for the DB
 - portainer: admin gui for the entire setup.
+- volumerize: Volume backup container. As configured now
+
+### Docker compose files
+The docker-compose setup is split into several docker-compose files. This allows to start parts of the setup in specific environments.
+- `docker-compose.yml`: This is the main docker-compose file. It contains nextcloud, db, proxy, and portainer. It't the most simple version and is ideal to be run on the local machine.
+- `docker-compose-adminer.yml`: contains the adminer container. This is only needed, if you want to do work on the db directly.
+- `docker-compose-backup.yml`: This adds the volumerize container to the setup. It will backup the volumens `db` and `nextcloud`. This is only needed for prod.
+- `docker-compose-es.yml`: This adds the elasticsearch container to index the nextcloud files and to allow fulltextsearch. This is only needed in prod.
+- `docker-compose-letsencrypt.yml`: This adds the let'sencrypt companion container for the nginx proxy. Such that every container, that is exposed by the proxy, gets its own certificate for its domain.
+- `docker-compose-restore.yml`: This container allows to restore from the backup. For more information see below.
+
+### Shellscripts
+There are some shell scripts, that pack together the docker-compose files for a given environment.
+- `docker-local.sh`: for local works
+- `docker-prod.sh`: for the prod environment.
+Both files need the acctual docker-compose commands, such as `up` or `down` to be appended as cli options. e.g. `./docker-local.sh up -d` or `./docker-prod.sh down`.
 
 ## Manual interaction when installing:
 
@@ -31,14 +47,17 @@ see here [https://www.elastic.co/guide/en/elasticsearch/reference/current/docker
 ### .env File
 create `.env` file with the following content (values need to be changed accordingly)
 ```ini
-#if "true", will fetch certs from letsencrypt. Use "false" locally 
-USE_LETSENCRYPT="false"
-
-#Password for mysql in the mysql containers
+#Password for mysql in the db containers
 MYSQL_ROOT_PASSWORD=my_root_pwd
+
+#database and user and pwd for nextcould database 
+MYSQL_DATABASE=nextcloud
+MYSQL_USER=nextcloud
 MYSQL_PASSWORD=my_pwd
 
-#DNS name for nextcloud
+#Nextcloud admin user name (this will only be used for initial setup)
+NEXTCLOUD_ADMIN_USER=oberuser
+#DNS name for nextcloud (will only be used for the initial setup)
 NEXTCLOUD_VIRTUAL_HOST=chischte.oberfeld.be
 #DNS name for nextcloud. Use it empty locally
 NEXTCLOUD_LETSENCRYPT_HOST=
