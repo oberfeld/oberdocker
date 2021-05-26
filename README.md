@@ -103,3 +103,8 @@ Set the configuration values for Fulltextsearch (Volltextsuche) in elasticsearch
 - Suchplattform: Elasticsearch
 - Adresse des Servlets: http://elasticsearch:9200/
 - index: nextcloud (vorschlag)
+
+### Configuration
+After Installation / Updates, readd our custom NextCloud configuration:
+- `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set default_language --value="de"`
+- `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set default_phone_region --value="CH"`
