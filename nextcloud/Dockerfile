@@ -1,13 +1,14 @@
-FROM nextcloud:16.0.5-apache
+FROM nextcloud:21-apache
 
-RUN apt-get update \
-  && apt-get install -y supervisor \
+RUN apt-get update && apt-get install -y \
+    supervisor libmagickcore-6.q16-6-extra \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
-  && mkdir /var/log/supervisord /var/run/supervisord  \
-  && echo "1 4 * * * php /var/www/html/occ fulltextsearch:index" >> /var/spool/cron/crontabs/www-data 
+  && mkdir /var/log/supervisord /var/run/supervisord  
 
 COPY supervisord.conf /etc/supervisor/supervisord.conf
+
+RUN echo "1 4 * * * php /var/www/html/occ fulltextsearch:index" >> /var/spool/cron/crontabs/www-data
 
 ENV NEXTCLOUD_UPDATE=1
 

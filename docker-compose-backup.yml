@@ -11,10 +11,16 @@ services:
       - PASSPHRASE=${BACKUP_PASSWORD}
       - VOLUMERIZE_FULL_IF_OLDER_THAN=1M
       - TZ=Europe/Berlin
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - db:/source/db:ro
+      - nextcloud:/source/nextcloud:ro
+      - ./keys:/keys
+    environment:
       - AWS_ACCESS_KEY_ID=    ${BACKUP_AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
       - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive-
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - db:/source/db:ro  
+      - db:/source/db:ro
       - nextcloud:/source/nextcloud:ro

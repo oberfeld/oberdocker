@@ -58,7 +58,7 @@ MYSQL_PASSWORD=my_pwd
 #Nextcloud admin user name (this will only be used for initial setup)
 NEXTCLOUD_ADMIN_USER=oberuser
 #DNS name for nextcloud (will only be used for the initial setup)
-NEXTCLOUD_VIRTUAL_HOST=greenbox.oberfeld.be
+NEXTCLOUD_VIRTUAL_HOST=chischte.oberfeld.be
 #DNS name for nextcloud. Use it empty locally
 NEXTCLOUD_LETSENCRYPT_HOST=
 #Password for admin user (will only be considered the first time nextcloud is installed)
@@ -88,6 +88,14 @@ BACKUP_AWS_ACCESS_KEY_ID=AKIATJMI3QLVH43AWW62
 BACKUP_AWS_SECRET_ACCESS_KEY=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
 
 ```
+### Auth keys for Backup
+The SSH key that are used to authenticate the user at the backup target host
+need to placed in `./keys/id_rsa`.
+You can use the command
+```bash
+$> mkdir keys && ssh-keygen -f keys/id_rsa -N ""
+``` 
+Then copy the content of the file `./keys/id_rsa.pub` to the backup-target's file `.ssh/authorized_keys`.
 
 ### Plugins for Nextcloud
 Install the following Apps in nextcloud
@@ -100,7 +108,15 @@ Set the configuration values for Fulltextsearch (Volltextsuche) in elasticsearch
 - Adresse des Servlets: http://elasticsearch:9200/
 - index: nextcloud (vorschlag)
 
-## Backup
+### Configuration
+After Installation / Updates, readd our custom NextCloud configuration:
+- `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set default_language --value="de"`
+- `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set default_phone_region --value="CH"`
+- `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set skeletondirectory --value=""`
+- `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set templatedirectory --value=""`
+
+
+## Backup for S3
 The database and the nextcloud files (data and code) are backed up (volumes `db`und `nextcloud`).
 This is done by the container `volumerize`. 
 
