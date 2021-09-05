@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 
 services:  
   volumerize:
@@ -16,11 +16,3 @@ services:
       - db:/source/db:ro
       - nextcloud:/source/nextcloud:ro
       - ./keys:/keys
-    environment:
-      - AWS_ACCESS_KEY_ID=    ${BACKUP_AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
-      - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive-
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - db:/source/db:ro
-      - nextcloud:/source/nextcloud:ro

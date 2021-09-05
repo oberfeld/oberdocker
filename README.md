@@ -140,33 +140,11 @@ The backup is executed by a cronjob that is specified in the `docker-compose-bac
 
 
 #### Helpful bashcripts
-- `./oberdocker-restore.sh`: preconfigures a docker-compose command for a _restore setup_ of oberdocker. You must specify the project by prepending the command with `COMPOSE_PROJECT_NAME=$projectname ` different from 'oberdocker'. Having a project name set, prefixes all container and volume names, such that it can run beside _prod_. You can specify it 'oberdocker' (same as _prod_), such that it will use the _prod_ volumes an it restores prod. Eitherway, this setup will run on port 8080.
-*Example: * `./oberdocker-restore.sh -p restore up`
-
-
-- `./restore-to.sh`: starts the restore setup by `./oberdocker-restore.sh` and rewinds the volumes `db` and `nextcloud` to a given point in time.
-  - 1. Parameter is project name ('oberdocker' to restore prod, something differen to restore on separate volumes)
-  - 2. Parameter is point in time in the format  _yyyy-mm-ddTHH:MM:SS+02:00_
-
-
-#### Restore to separate Environment
-You start a separate docker-compose project for a given time in the history by running the script
-`./restore-to.sh restore yyyy-mm-ddTHH:MM:SS+02:00` Where _restore_ is the name of the docker-compose project and yyyy-mm-ddTHH:MM:SS+02:00 is the time you would like to ristore.
-
-
- If these files are reachable in the S3 Bucket (you probably need to restore them from Glacier) you will have this setup winded back to the latest backup befor the specified point in time reachable under the same host but differen port (8080).
-##### Restore to production
-This scenario has not been testet. But it has to work as follows:
-- Shut down prod `./oberdocker-prod.sh down`
-- Fix the docker project name in `./oberdocker-restore.sh` to 'oberdocker'
-- Run `./restore-to.sh yyyy-mm-ddTHH:MM:SS+02:00` while specifing the correct where to restore from.
-
-
-Restoring the Files in S3 Bucket from glacier will take about 2 Days, and you'll need to restore all files up to the latest full backup. With the incremental backup files, restoring will not work.
-
-#### Instatiate the system locally with the data of a former point in time
-This scenario is helpful to restore individual files or information from a backup.
-
-For this, use the `docker-compose.for-backup.yml`
-This file has been created by doing the following
-- copy `docker-compose.yml` to `docker-compose.for-backup.yml`
+- `./oberdocker-restore.sh`: restores the latest backup. 
+You must specify the project by prepending the command with `COMPOSE_PROJECT_NAME=$projectname `.
+Having a project name set, prefixes all container and volume names, 
+such that it can run beside _prod_.
+  *Example: * `./oberdocker-restore.sh -p restore up`
+- If you choose it different from 'oberdocker', the recovery is done on separate volumes and a parallel project is starter afterwards,
+where you can analyse the backup.
+- If you choose it 'oberdocker', the recovery will be done for the relevant (productive) volumes. This will overwrite the data there.
