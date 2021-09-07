@@ -39,7 +39,7 @@ if [[ $COMPOSE_PROJECT_NAME = "oberdocker" ]];
   then
     echo restore is completed.
   else
-    echo I can this environment on port $PORT_HTTP and PORT_HTTPS
+    echo I can start up this environment on port $PORT_HTTP and PORT_HTTPS
     read -p "Should i do so? Y or N?: " -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]] ; then

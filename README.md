@@ -83,9 +83,9 @@ BACKUP_PASSWORD=very secure password
 #Target (S3 bucket) where the backup should be saved to (duplicity option)
 BACKUP_TARGET=s3://s3.eu-central-1.amazonaws.com/oberfeld
 #The accessKey ID for the user that has write access to the S3 Bucket (duplicity option)
-BACKUP_AWS_ACCESS_KEY_ID=AKIATJMI3QLVH43AWW62
+BACKUP_AWS_ACCESS_KEY_ID=<YOUR ACCESS KEY ID>
 #The accessKey secret for the user that has write access to the S3 Bucket (duplicity option)
-BACKUP_AWS_SECRET_ACCESS_KEY=3q/iaNUQYG8KFrmVSTDf6Db24n4wdYSg5YtX2z7W
+BACKUP_AWS_SECRET_ACCESS_KEY=<YOUR ACCESS KEY>
 
 ```
 ### Auth keys for Backup
@@ -127,7 +127,7 @@ To set up an S3 Bucket, I (@inthemill) have done the following:
 - Create an account `oberfeld-it`
 - Register my credit card
 - On S3 create the bucket that you will specify in the `.env` file
-- im the IAM of this account, create the user who's ID and secret, you will specify in the `.env` file.
+- in the IAM of this account, create the user, whose ID and secret, you will specify in the `.env` file.
 - Apply to this backup-user the needed rights
     - TBD
 
