@@ -10,7 +10,7 @@ This docker-compose setup consist of the following containers:
 - adminer: GUI for the db
 - letsencrypt-companion: companion for proxy to download certificates for https encryptions
 - portainer: admin gui for the entire setup.
-- volumerize: Volume backup container. As configured now
+- volumerize: Volume backup container. As configured now, it will backup to an S3 Bucket
 
 ### Docker compose files
 The docker-compose setup is split into several docker-compose files. This allows to start parts of the setup in specific environments.
@@ -30,7 +30,7 @@ Both files need the acctual docker-compose commands, such as `up` or `down` to b
 ## Manual interaction when installing:
 
 ### (local only) set host names
-To be able to access the different application you need to choose different domains for this, as 
+To be able to access the different application you need to choose different domains for these, as 
 the proxy redirect based on the hostname used to call the request.
 
 On linux and mac, you may add those hosts in the `/etc/hosts` file, such as 
@@ -80,8 +80,12 @@ ELASTICSEARCH_MEM_IN_MB=1000
 
 #Password used to encrypt the backup
 BACKUP_PASSWORD=very secure password
-#Target where the backup should be saved to (duplicity option)
-BACKUP_TARGET=pexpect+scp://backuphost
+#Target (S3 bucket) where the backup should be saved to (duplicity option)
+BACKUP_TARGET=s3://s3.eu-central-1.amazonaws.com/oberfeld
+#The accessKey ID for the user that has write access to the S3 Bucket (duplicity option)
+BACKUP_AWS_ACCESS_KEY_ID=<YOUR ACCESS KEY ID>
+#The accessKey secret for the user that has write access to the S3 Bucket (duplicity option)
+BACKUP_AWS_SECRET_ACCESS_KEY=<YOUR ACCESS KEY>
 
 ```
 ### Auth keys for Backup
@@ -110,3 +114,37 @@ After Installation / Updates, readd our custom NextCloud configuration:
 - `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set default_phone_region --value="CH"`
 - `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set skeletondirectory --value=""`
 - `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set templatedirectory --value=""`
+
+
+## Backup for S3
+The database and the nextcloud files (data and code) are backed up (volumes `db`und `nextcloud`).
+This is done by the container `volumerize`. 
+
+### Setup
+The backup enpoint is an S3 bucket. 
+
+To set up an S3 Bucket, I (@inthemill) have done the following:
+- Create an account `oberfeld-it`
+- Register my credit card
+- On S3 create the bucket that you will specify in the `.env` file
+- in the IAM of this account, create the user, whose ID and secret, you will specify in the `.env` file.
+- Apply to this backup-user the needed rights
+    - TBD
+
+### Run the Backup
+The backup is executed by a cronjob that is specified in the `docker-compose-backup.yml` file as environment variable of the `volumerize` container.
+
+### Restore
+
+#### S3 Bucket properties.
+
+
+#### Helpful bashcripts
+- `./oberdocker-restore.sh`: restores the latest backup. 
+You must specify the project by prepending the command with `COMPOSE_PROJECT_NAME=$projectname `.
+Having a project name set, prefixes all container and volume names, 
+such that it can run beside _prod_.
+  *Example: * `./oberdocker-restore.sh -p restore up`
+- If you choose it different from 'oberdocker', the recovery is done on separate volumes and a parallel project is starter afterwards,
+where you can analyse the backup.
+- If you choose it 'oberdocker', the recovery will be done for the relevant (productive) volumes. This will overwrite the data there.

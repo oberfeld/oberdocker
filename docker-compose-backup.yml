@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 
 services:  
   volumerize:
@@ -13,6 +13,6 @@ services:
       - TZ=Europe/Berlin
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - db:/source/db:ro  
+      - db:/source/db:ro
       - nextcloud:/source/nextcloud:ro
       - ./keys:/keys

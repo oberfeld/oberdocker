@@ -2,6 +2,7 @@ FROM nextcloud:21-apache
 
 RUN apt-get update && apt-get install -y \
     supervisor libmagickcore-6.q16-6-extra \
+  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   && mkdir /var/log/supervisord /var/run/supervisord  
 

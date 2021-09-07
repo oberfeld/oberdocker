@@ -1,4 +1,4 @@
-FROM blacklabelops/volumerize
+FROM blacklabelops/volumerize:1.7.1
 
 # disable host key checking and set identity file to /keys/id_rsa
 ADD ssh_config /etc/ssh/ssh_config 
