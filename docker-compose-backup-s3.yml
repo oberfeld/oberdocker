@@ -7,13 +7,13 @@ services:
       - VOLUMERIZE_SOURCE=/source
       - VOLUMERIZE_TARGET=${BACKUP_TARGET_S3}
       - VOLUMERIZE_JOBBER_TIME=0 0 2 * * *
-      - VOLUMERIZE_CONTAINERS=${COMPOSE_PROJECT_NAME}_db_1 ${COMPOSE_PROJECT_NAME}_nextcloud_1
+      - VOLUMERIZE_CONTAINERS=${COMPOSE_PROJECT_NAME}_nextcloud_1 ${COMPOSE_PROJECT_NAME}_db_1
       - PASSPHRASE=${BACKUP_PASSWORD}
       - VOLUMERIZE_FULL_IF_OLDER_THAN=1M
       - TZ=Europe/Berlin
       - AWS_ACCESS_KEY_ID=    ${BACKUP_AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
-      - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive- --s3-use-new-style --volsize 20000 --s3-multipart-chunk-size 50
+      - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive- --verbosity=INFO --s3-use-new-style --volsize 2000 --s3-multipart-chunk-size 50
     volumes:
       - type: bind
         source: /var/run/docker.sock
