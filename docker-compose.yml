@@ -63,7 +63,6 @@ services:
       - vhost.d:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - acme:/etc/acme.sh
     networks:
       - proxy-tier
 
@@ -71,10 +70,10 @@ volumes:
   db:
   nextcloud:
   certs:
+  acme:
   vhost.d:
   html:
   portainer_data:
-  acme:
 
 networks:
   proxy-tier:
