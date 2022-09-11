@@ -24,8 +24,9 @@ services:
       - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_VIRTUAL_HOST}
       - NEXTCLOUD_ADMIN_USER
       - NEXTCLOUD_ADMIN_PASSWORD
-      - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST},oberfed.be
-      - LETSENCRYPT_HOST=${NEXTCLOUD_LETSENCRYPT_HOST},oberfed.be
+      - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST}
+      - LETSENCRYPT_TEST=true
+      - LETSENCRYPT_HOST=${NEXTCLOUD_LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
       - MYSQL_HOST=db
       - MYSQL_DATABASE
@@ -45,8 +46,9 @@ services:
       - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - VIRTUAL_HOST=${PORTAINER_VIRTUAL_HOST},oberfed.be
-      - LETSENCRYPT_HOST=${PORTAINER_LETSENCRYPT_HOST},oberfed.be
+      - VIRTUAL_HOST=${PORTAINER_VIRTUAL_HOST}
+      - LETSENCRYPT_TEST=true
+      - LETSENCRYPT_HOST=${PORTAINER_LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
       - PORTAINER_PASSWORD_HASH
     networks:
