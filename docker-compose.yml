@@ -12,8 +12,6 @@ services:
       - MYSQL_DATABASE
       - MYSQL_USER
       - MYSQL_PASSWORD
-    networks:
-      - default
 
   nextcloud:
     build: ./nextcloud
@@ -58,6 +56,8 @@ services:
     ports:
       - ${PORT_HTTP:-80}:80
       - ${PORT_HTTPS:-443}:443
+    labels:
+      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
     volumes:
       - certs:/etc/nginx/certs:ro
       - vhost.d:/etc/nginx/vhost.d
@@ -77,4 +77,3 @@ volumes:
 
 networks:
   proxy-tier:
-  default:
