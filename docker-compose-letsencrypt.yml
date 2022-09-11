@@ -9,11 +9,10 @@ services:
     image: jrcs/letsencrypt-nginx-proxy-companion
     restart: always
     volumes:
-      - certs:/etc/nginx/certs:ro
+      - certs:/etc/nginx/certs
       - vhost.d:/etc/nginx/vhost.d
       - html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - acme:/etc/acme.sh
     networks:
       - proxy-tier
     depends_on:
@@ -28,7 +27,6 @@ volumes:
   vhost.d:
   html:
   portainer_data:
-  acme:
 
 networks:
   proxy-tier:
