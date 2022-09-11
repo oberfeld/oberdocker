@@ -45,8 +45,8 @@ services:
       - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - VIRTUAL_HOST=${PORTAINER_VIRTUAL_HOST} 
-      - LETSENCRYPT_HOST=${PORTAINER_LETSENCRYPT_HOST}
+      - VIRTUAL_HOST=${PORTAINER_VIRTUAL_HOST},www.chischte.oberfed.be
+      - LETSENCRYPT_HOST=${PORTAINER_LETSENCRYPT_HOST},www.chischte.oberfed.be
       - LETSENCRYPT_EMAIL=it@oberfeld.be
       - PORTAINER_PASSWORD_HASH
     networks:
