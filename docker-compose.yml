@@ -22,8 +22,12 @@ services:
       - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_VIRTUAL_HOST}
       - NEXTCLOUD_ADMIN_USER
       - NEXTCLOUD_ADMIN_PASSWORD
-      - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST},chischtezwei.oberfeld.be
-      - LETSENCRYPT_HOST=${NEXTCLOUD_LETSENCRYPT_HOST},chischtezwei.oberfeld.be
+      - TRUSTED_PROXIES=${NEXTCLOUD_VIRTUAL_HOST}
+      - OVERWRITEHOST=${NEXTCLOUD_VIRTUAL_HOST}
+      - OVERWRITECLIURL=https://${NEXTCLOUD_VIRTUAL_HOST}
+      - OVERWRITEPROTOCOL=https
+      - VIRTUAL_HOST=${NEXTCLOUD_VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${NEXTCLOUD_LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
       - MYSQL_HOST=db
       - MYSQL_DATABASE
@@ -43,8 +47,8 @@ services:
       - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - VIRTUAL_HOST=${PORTAINER_VIRTUAL_HOST},chischtezwei.oberfeld.be
-      - LETSENCRYPT_HOST=${PORTAINER_LETSENCRYPT_HOST},chischtezwei.oberfeld.be
+      - VIRTUAL_HOST=${PORTAINER_VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${PORTAINER_LETSENCRYPT_HOST}
       - LETSENCRYPT_EMAIL=it@oberfeld.be
       - PORTAINER_PASSWORD_HASH
     networks:
