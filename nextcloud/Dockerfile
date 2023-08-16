@@ -1,4 +1,4 @@
-FROM nextcloud:26-apache
+FROM nextcloud:27-apache
 
 RUN apt-get update && apt-get install -y \
     supervisor libmagickcore-6.q16-6-extra \
