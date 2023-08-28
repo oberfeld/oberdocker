@@ -8,6 +8,7 @@ services:
       - cluster.name=green-cluster
       - bootstrap.memory_lock=true
       - discovery.type=single-node
+      - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms${ELASTICSEARCH_MEM_IN_MB}m -Xmx${ELASTICSEARCH_MEM_IN_MB}m"
     ports:
       - 9200:9200
