@@ -10,6 +10,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - "ES_JAVA_OPTS=-Xms${ELASTICSEARCH_MEM_IN_MB}m -Xmx${ELASTICSEARCH_MEM_IN_MB}m"
+      - ELASTICSEARCH_PLUGINS=ingest-attachment
     ports:
       - 9200:9200
       - 9300:9300
