@@ -144,7 +144,10 @@ The backup is executed by a cronjob that is specified in the `docker-compose-bac
 You must specify the project by prepending the command with `COMPOSE_PROJECT_NAME=$projectname `.
 Having a project name set, prefixes all container and volume names, 
 such that it can run beside _prod_.
-  *Example: * `./oberdocker-restore.sh -p restore up`
+  
+*Example: * `./oberdocker-restore.sh -p restore up`
+- 
 - If you choose it different from 'oberdocker', the recovery is done on separate volumes and a parallel project is starter afterwards,
 where you can analyse the backup.
 - If you choose it 'oberdocker', the recovery will be done for the relevant (productive) volumes. This will overwrite the data there.
+- To restore a specific Time in the past, you can add the option -t see [https://duplicity.nongnu.org/vers7/duplicity.1.html#sect8]
