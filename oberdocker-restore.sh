@@ -33,7 +33,7 @@ fi
 NO_RESTORE=false docker-compose \
     --file docker-compose.yml \
     --file docker-compose-backup.yml \
-    run volumerize restore || exit 1
+    run volumerize restore $@ || exit 1
 
 if [[ $COMPOSE_PROJECT_NAME = "oberdocker" ]];
   then
