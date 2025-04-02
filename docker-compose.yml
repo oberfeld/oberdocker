@@ -6,7 +6,7 @@ services:
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
     volumes:
-      - db:/var/lib/mysql
+      - db:/var/lib/mysql:z
     environment:
       - MYSQL_ROOT_PASSWORD
       - MYSQL_DATABASE
@@ -17,7 +17,7 @@ services:
     build: ./nextcloud
     restart: unless-stopped
     volumes:
-      - nextcloud:/var/www/html
+      - nextcloud:/var/www/html:z
     environment:
       - NEXTCLOUD_TRUSTED_DOMAINS=${NEXTCLOUD_VIRTUAL_HOST}
       - NEXTCLOUD_ADMIN_USER
@@ -34,9 +34,23 @@ services:
       - MYSQL_PASSWORD
     depends_on:
       - db
+      # Added proxy container dependency below.
+      # It is unclear on when or why it happens, but sometimes NC manages to start before the proxy
+      #  and it breaks for whatever weird reason resulting in the need of manual proxy container restart.
+      - proxy
     networks:
       - proxy-tier
       - default
+
+  cron:
+    image: nextcloud:apache
+    restart: always
+    volumes:
+      - nextcloud:/var/www/html:z
+      # NOTE: The `volumes` config of the `cron` and `app` containers must match
+    entrypoint: /cron.sh
+    depends_on:
+      - db
 
   collabora:
     image: collabora/code
@@ -84,12 +98,13 @@ services:
       - ${PORT_HTTP:-80}:80
       - ${PORT_HTTPS:-443}:443
     labels:
-      com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy"
     volumes:
-      - certs:/etc/nginx/certs:ro
-      - vhost.d:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - certs:/etc/nginx/certs:ro,z
+      - vhost.d:/etc/nginx/vhost.d:z
+      - html:/usr/share/nginx/html:z
+      - dhparam:/etc/nginx/dhparam:z
+      - /var/run/docker.sock:/tmp/docker.sock:ro,z
     networks:
       - proxy-tier
 
@@ -100,6 +115,7 @@ volumes:
   acme:
   vhost.d:
   html:
+  dhparam:
   portainer_data:
 
 networks:
