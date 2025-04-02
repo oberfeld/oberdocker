@@ -38,6 +38,30 @@ services:
       - proxy-tier
       - default
 
+  collabora:
+    image: collabora/code
+    container_name: collabora
+    restart: always
+    networks:
+      - proxy-tier
+    depends_on:
+      - proxy
+    cap_add:
+     - MKNOD
+    ports:
+      - 127.0.0.1:9980:9980
+    environment:
+      # IMPORTANT: Note the backslashs before the dots here (and only here)!
+      - domain=${NEXTCLOUD_VIRTUAL_HOST}
+      - username=${COLLABORA_ADMIN_USER}
+      - password=${COLLABORA_ADMIN_PASSWORD}
+      - VIRTUAL_HOST=${COLLABORA_VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${COLLABORA_LETSENCRYPT_HOST}
+      - VIRTUAL_NETWORK=proxy-tier
+      - VIRTUAL_PORT=9980
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true
+      - dictionaries=de_CH,fr_CH
+
   portainer:
     image: portainer/portainer
     command: --admin-password ${PORTAINER_PASSWORD_HASH}
