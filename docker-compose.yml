@@ -65,7 +65,6 @@ services:
     ports:
       - 127.0.0.1:9980:9980
     environment:
-      # IMPORTANT: Note the backslashs before the dots here (and only here)!
       - domain=${NEXTCLOUD_VIRTUAL_HOST}
       - username=${COLLABORA_ADMIN_USER}
       - password=${COLLABORA_ADMIN_PASSWORD}
