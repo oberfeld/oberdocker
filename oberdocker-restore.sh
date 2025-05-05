@@ -21,7 +21,7 @@ if [[ $COMPOSE_PROJECT_NAME = "oberdocker" ]] ; then
         exit 0
     fi
   else
-    echo The compose project name is set to '$COMPOSE_PROJECT_NAME'.
+    echo The compose project name is set to $COMPOSE_PROJECT_NAME.
     echo The data will be written to volumes prefixed with $COMPOSE_PROJECT_NAME
     read -p "Should we proceed? Y or N?: " -n 1 -r
     echo
@@ -33,7 +33,7 @@ fi
 NO_RESTORE=false docker-compose \
     --file docker-compose.yml \
     --file docker-compose-backup.yml \
-    run volumerize restore || exit 1
+    run volumerize restore $@ || exit 1
 
 if [[ $COMPOSE_PROJECT_NAME = "oberdocker" ]];
   then
