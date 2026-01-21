@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   elasticsearch:
-    image: elasticsearch:8.9.1
+    image: elasticsearch:9.2.4
     restart: always
     environment:
       - cluster.name=green-cluster
