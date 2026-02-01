@@ -8,12 +8,11 @@ services:
       - cluster.name=green-cluster
       - bootstrap.memory_lock=true
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=false
+      - ELASTIC_PASSWORD=${ELASTICSEARCH_PASSWORD}
       - "ES_JAVA_OPTS=-Xms${ELASTICSEARCH_MEM_IN_MB}m -Xmx${ELASTICSEARCH_MEM_IN_MB}m"
       - ELASTICSEARCH_PLUGINS=ingest-attachment
-    ports:
-      - 9200:9200
-      - 9300:9300
     ulimits:
       memlock:
         soft: -1
@@ -24,3 +23,7 @@ services:
       - default
 volumes:
   esdata:
+
+networks:
+  default:
+    driver: bridge
