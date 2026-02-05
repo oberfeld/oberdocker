@@ -13,7 +13,8 @@ RUN apt-get update && \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --chmod=755 convert-eml.sh /usr/local/bin/convert-eml.sh
+COPY convert-eml.sh /usr/local/bin/convert-eml.sh
+RUN chmod 755 /usr/local/bin/convert-eml.sh
 
 # Run as www-data (UID 33) to match Nextcloud file ownership
 USER 33:33
