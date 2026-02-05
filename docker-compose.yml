@@ -76,7 +76,7 @@ services:
           cpus: '1.0'      
 
   collabora:
-    image: collabora/code:24.04
+    image: collabora/code:24
     container_name: collabora
     restart: always
     networks:
