@@ -1,0 +1,3 @@
+# Crontab for borgmatic
+# Run backup daily at 2am
+0 2 * * * PATH=$PATH:/usr/local/bin /usr/local/bin/borgmatic --stats -v 0 2>&1

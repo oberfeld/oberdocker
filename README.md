@@ -122,35 +122,59 @@ After Installation / Updates, readd our custom NextCloud configuration:
 - `docker exec -i --user www-data oberdocker_nextcloud_1 php occ config:system:set templatedirectory --value=""`
 
 
-## Backup for S3
+## Backup to S3
 The database and the nextcloud files (data and code) are backed up (volumes `db` and `nextcloud`).
-This is done by the container `volumerize`. 
+This is done by the container `backup` using [BorgBackup](https://www.borgbackup.org/) + [borgmatic](https://torsion.org/borgmatic/).
+
+### Features
+- **Incremental & deduplicated** backups (like Nextcloud AIO uses)
+- Daily backups at 2am
+- Encrypted with `BACKUP_PASSWORD`
+- Retention: 7 daily, 4 weekly, 6 monthly backups
+- Local Borg repository synced to S3 via rclone
 
 ### Setup
-The backup endpoint is an S3 bucket. 
+See [BACKUP-SETUP.md](BACKUP-SETUP.md) for initial setup instructions.
 
-To set up an S3 Bucket, I (@inthemill) have done the following:
-- Create an account `oberfeld-it`
-- Register my credit card
-- On S3 create the bucket that you will specify in the `.env` file
-- in the IAM of this account, create the user, whose ID and secret, you will specify in the `.env` file.
-- Apply to this backup-user the needed rights
-    - TBD
+### Run Backup Manually
+```bash
+docker exec oberdocker-backup-1 borgmatic --stats -v 1
+```
 
-### Run the Backup
-The backup is executed by a cronjob that is specified in the `docker-compose-backup.yml` file as environment variable of the `volumerize` container.
+### List Available Backups
+```bash
+docker exec oberdocker-backup-1 borgmatic list
+```
 
 ### Restore
+To restore from a backup:
+```bash
+# Stop Nextcloud first
+docker stop oberdocker-nextcloud-1
 
-#### S3 Bucket properties.
+# List available archives
+docker exec -it oberdocker-backup-1 borgmatic list
 
+# Extract a specific archive (interactive)
+docker exec -it oberdocker-backup-1 borgmatic extract --archive latest
 
-#### Helpful bashcripts
-- `./oberdocker-restore.sh`: restores the latest backup. 
-You must specify the project by prepending the command with `COMPOSE_PROJECT_NAME=$projectname `.
-Having a project name set, prefixes all container and volume names, 
-such that it can run beside _prod_.
-  *Example: * `./oberdocker-restore.sh -p restore up`
-- If you choose it different from 'oberdocker', the recovery is done on separate volumes and a parallel project is starter afterwards,
-where you can analyse the backup.
-- If you choose it 'oberdocker', the recovery will be done for the relevant (productive) volumes. This will overwrite the data there.
+# Or use the restore compose file for interactive shell
+docker compose -f docker-compose-restore.yml run --rm restore
+# Inside container:
+borgmatic list
+borgmatic extract --archive <archive-name> --destination /mnt/source
+```
+
+### Sync to S3
+The backup automatically syncs to S3 after each backup. To manually sync:
+```bash
+docker exec oberdocker-backup-1 rclone sync /mnt/borg-repository s3:oberfeld/borg-backup
+```
+
+### Download from S3 (disaster recovery)
+If you need to restore on a new server:
+```bash
+docker exec oberdocker-backup-1 rclone sync s3:oberfeld/borg-backup /mnt/borg-repository
+```
+
+**Warning:** Restoring will overwrite current data in the volumes.

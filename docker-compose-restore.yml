@@ -1,19 +1,31 @@
-version: '3.2'
-
 services:
   restore:
-    build: ./volumerize
+    build: ./borgmatic
     container_name: restore
     environment:
-      - VOLUMERIZE_SOURCE=/source
-      - VOLUMERIZE_TARGET=${BACKUP_TARGET}
-      - VOLUMERIZE_CONTAINERS=${COMPOSE_PROJECT_NAME}_db_1 ${COMPOSE_PROJECT_NAME}_nextcloud_1
-      - PASSPHRASE=${BACKUP_PASSWORD}
       - TZ=Europe/Berlin
-      - AWS_ACCESS_KEY_ID=    ${BACKUP_AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
-      - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive-
+      - BORG_PASSPHRASE=${BACKUP_PASSWORD}
+      # S3 credentials for rclone (to download repo if needed)
+      - RCLONE_CONFIG_S3_TYPE=s3
+      - RCLONE_CONFIG_S3_PROVIDER=AWS
+      - RCLONE_CONFIG_S3_ACCESS_KEY_ID=${BACKUP_AWS_ACCESS_KEY_ID}
+      - RCLONE_CONFIG_S3_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
+      - RCLONE_CONFIG_S3_REGION=eu-central-1
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - db:/source/db  
-      - nextcloud:/source/nextcloud
+      - ./borgmatic/config.yaml:/etc/borgmatic.d/config.yaml:ro
+      # Volumes to restore TO (writable)
+      - db:/mnt/source/db
+      - nextcloud:/mnt/source/nextcloud
+      # Borg repository
+      - borg-repo:/mnt/borg-repository
+      - borg-cache:/root/.cache/borg
+      - borg-config:/root/.config/borg
+    # Interactive shell for manual restore
+    entrypoint: /bin/sh
+    stdin_open: true
+    tty: true
+
+volumes:
+  borg-repo:
+  borg-cache:
+  borg-config:

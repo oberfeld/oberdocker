@@ -1,0 +1,52 @@
+# Borgmatic configuration for Nextcloud backup
+# Documentation: https://torsion.org/borgmatic/docs/reference/configuration/
+
+# Source directories to backup
+source_directories:
+  - /mnt/source/db
+  - /mnt/source/nextcloud
+
+# Borg repository location
+repositories:
+  - path: /mnt/borg-repository
+    label: local
+
+# Archive naming
+archive_name_format: 'nextcloud-{now:%Y-%m-%d-%H%M%S}'
+
+# Retention policy - keep:
+retention:
+  keep_daily: 7       # Last 7 daily backups
+  keep_weekly: 4      # Last 4 weekly backups
+  keep_monthly: 6     # Last 6 monthly backups
+
+# Compression (lz4 is fast, zstd is better ratio)
+compression: auto,zstd
+
+# Exclude patterns
+exclude_patterns:
+  - '*.tmp'
+  - '*.log'
+  - '**/cache/**'
+  - '**/Cache/**'
+
+# Consistency checks
+checks:
+  - name: repository
+    frequency: 1 week
+  - name: archives
+    frequency: 1 month
+
+# Hooks for container management and S3 sync
+hooks:
+  before_backup:
+    - echo "Starting Nextcloud backup..."
+  
+  after_backup:
+    - echo "Backup completed. Syncing to S3..."
+    # Sync Borg repository to S3 using rclone
+    - rclone sync /mnt/borg-repository s3:oberfeld/borg-backup --transfers 4 --progress || echo "S3 sync failed, local backup still valid"
+    - echo "S3 sync completed."
+  
+  on_error:
+    - echo "Backup failed!"
