@@ -1,5 +1,3 @@
-version: '3.2'
-
 services:  
   volumerize:
     image: blacklabelops/volumerize:1.7.1
@@ -15,14 +13,6 @@ services:
       - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
       - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive- --verbosity=INFO --s3-use-new-style --volsize 2000 --s3-multipart-chunk-size 50
     volumes:
-      - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
-      - type: volume
-        source: db
-        target: /source/db
-        read_only: ${NO_RESTORE:-true}
-      - type: volume
-        source: nextcloud
-        target: /source/nextcloud
-        read_only: ${NO_RESTORE:-true}
+      - /var/run/docker.sock:/var/run/docker.sock
+      - db:/source/db:ro
+      - nextcloud:/source/nextcloud:ro
