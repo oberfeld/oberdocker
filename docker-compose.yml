@@ -1,8 +1,6 @@
-version: '3.2'
-
 services:
   db:
-    image: mariadb
+    image: mariadb:lts
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
     restart: unless-stopped
     volumes:
@@ -78,7 +76,7 @@ services:
           cpus: '1.0'      
 
   collabora:
-    image: collabora/code
+    image: collabora/code:24.04
     container_name: collabora
     restart: always
     networks:
@@ -101,7 +99,7 @@ services:
       - dictionaries=de_CH,fr_CH
 
   portainer:
-    image: portainer/portainer
+    image: portainer/portainer-ce:lts
     command: --admin-password ${PORTAINER_PASSWORD_HASH}
     restart: always
     volumes:

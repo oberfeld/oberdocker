@@ -1,8 +1,6 @@
-version: '3.2'
-
 services:
   adminer:
-    image: adminer:4.6.3
+    image: adminer:latest
     environment:
       - VIRTUAL_HOST=${ADMINER_MARIA_VIRTUAL_HOST}
       - LETSENCRYPT_HOST=${ADMINER_MARIA_LETSENCRYPT_HOST}

@@ -30,7 +30,7 @@ if [[ $COMPOSE_PROJECT_NAME = "oberdocker" ]] ; then
     fi
 fi
 
-NO_RESTORE=false docker-compose \
+NO_RESTORE=false docker compose \
     --file docker-compose.yml \
     --file docker-compose-backup.yml \
     run volumerize restore || exit 1
@@ -44,9 +44,9 @@ if [[ $COMPOSE_PROJECT_NAME = "oberdocker" ]];
     echo
     if [[ ! $REPLY =~ ^[Yy]$ ]] ; then
         echo you can do it yourself with the following command:
-        echo COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME docker-compose -f docker-compose.yml up
+        echo COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME docker compose -f docker-compose.yml up
         exit 0
     fi
-    docker-compose -f docker-compose.yml up
+    docker compose -f docker-compose.yml up
 fi
 

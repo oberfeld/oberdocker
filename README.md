@@ -4,13 +4,16 @@
 
 This docker-compose setup consist of the following containers:
 - nextcloud: The container running the nextcloud app
-- db: MariaDb container to store nextclouds data 
+- db: MariaDb container to store nextclouds data
+- cron: Runs Nextcloud background jobs every 5 minutes
 - elasticsearch: The container running the elasticsearch index for the fulltextsearch
 - proxy: Ngin-X server to automatically route different domains/virtual host to the corresponding container ips
 - adminer: GUI for the db
 - letsencrypt-companion: companion for proxy to download certificates for https encryptions
+- collabora: Collabora Online for editing documents in the browser
 - portainer: admin gui for the entire setup.
 - volumerize: Volume backup container. As configured now, it will backup to an S3 Bucket
+- eml-converter: Automatically converts .eml email files to PDF. Watches the Nextcloud data directory for new .eml files and creates a corresponding .pdf file using [email-to-pdf-converter](https://github.com/nickrussler/email-to-pdf-converter).
 
 ### Docker compose files
 The docker-compose setup is split into several docker-compose files. This allows to start parts of the setup in specific environments.
@@ -23,9 +26,9 @@ The docker-compose setup is split into several docker-compose files. This allows
 
 ### Shellscripts
 There are some shell scripts, that pack together the docker-compose files for a given environment.
-- `docker-local.sh`: for local works
-- `docker-prod.sh`: for the prod environment.
-Both files need the acctual docker-compose commands, such as `up` or `down` to be appended as cli options. e.g. `./docker-local.sh up -d` or `./docker-prod.sh down`.
+- `oberdocker-local.sh`: for local works
+- `oberdocker-prod.sh`: for the prod environment.
+Both files need the actual docker compose commands, such as `up` or `down` to be appended as cli options. e.g. `./oberdocker-local.sh up -d` or `./oberdocker-prod.sh down`.
 
 ## Manual interaction when installing:
 
@@ -45,57 +48,60 @@ elasticsearch needs vm.max_map_count to be set to a min of 262144
 see here [https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html]
 
 ### .env File
-create `.env` file with the following content (values need to be changed accordingly)
+Create `.env` file with the following content. Values marked with `<CHANGE_ME>` must be replaced with your own values.
+
 ```ini
-#Password for mysql in the db containers
-MYSQL_ROOT_PASSWORD=my_root_pwd
+# ===========================================
+# DATABASE (MariaDB)
+# ===========================================
+MYSQL_ROOT_PASSWORD=<CHANGE_ME>              # Root password for MySQL
+MYSQL_DATABASE=nextcloud                      # Database name (can keep as-is)
+MYSQL_USER=nextcloud                          # Database user (can keep as-is)
+MYSQL_PASSWORD=<CHANGE_ME>                   # Password for MYSQL_USER
 
-#database and user and pwd for nextcould database 
-MYSQL_DATABASE=nextcloud
-MYSQL_USER=nextcloud
-MYSQL_PASSWORD=my_pwd
+# ===========================================
+# NEXTCLOUD
+# ===========================================
+NEXTCLOUD_ADMIN_USER=<CHANGE_ME>             # Admin username (only used on initial setup), e.g. oberuser
+NEXTCLOUD_ADMIN_PASSWORD=<CHANGE_ME>         # Admin password (only used on initial setup)
+NEXTCLOUD_VIRTUAL_HOST=<CHANGE_ME>           # DNS name, e.g. chischte.oberfeld.be
+NEXTCLOUD_LETSENCRYPT_HOST=                   # Same as above for prod, empty for local
 
-#Nextcloud admin user name (this will only be used for initial setup)
-NEXTCLOUD_ADMIN_USER=oberuser
-#DNS name for nextcloud (will only be used for the initial setup)
-NEXTCLOUD_VIRTUAL_HOST=chischte.oberfeld.be
-#DNS name for nextcloud. Use it empty locally
-NEXTCLOUD_LETSENCRYPT_HOST=
-#Password for admin user (will only be considered the first time nextcloud is installed)
-NEXTCLOUD_ADMIN_PASSWORD=my_nextcloud_admin_pwd
+# ===========================================
+# ADMINER (Database GUI)
+# ===========================================
+ADMINER_MARIA_VIRTUAL_HOST=<CHANGE_ME>       # DNS name, e.g. adminer.oberfeld.be
+ADMINER_MARIA_LETSENCRYPT_HOST=               # Same as above for prod, empty for local
 
-#DNS name for adminer
-ADMINER_MARIA_VIRTUAL_HOST=adminer.oberfeld.be
-#DNS name for adminer. Use it empty locally
-ADMINER_MARIA_LETSENCRYPT_HOST=
+# ===========================================
+# COLLABORA (Online document editing)
+# ===========================================
+COLLABORA_VIRTUAL_HOST=<CHANGE_ME>           # DNS name, e.g. collabora.oberfeld.be
+COLLABORA_LETSENCRYPT_HOST=                   # Same as above for prod, empty for local
+COLLABORA_ADMIN_USER=<CHANGE_ME>             # Collabora admin username
+COLLABORA_ADMIN_PASSWORD=<CHANGE_ME>         # Collabora admin password
 
-#DNS name for portainer
-PORTAINER_VIRTUAL_HOST=portainer.oberfeld.be
-#DNS name for portainer. Use it empty locally
-PORTAINER_LETSENCRYPT_HOST=
-PORTAINER_PASSWORD_HASH=$2y$05$ksEgrHIJdw1gR5ZySLafDeWH2NIHl20rkva9r4oK54goI/yT1jI4S
+# ===========================================
+# PORTAINER (Docker admin GUI)
+# ===========================================
+PORTAINER_VIRTUAL_HOST=<CHANGE_ME>           # DNS name, e.g. portainer.oberfeld.be
+PORTAINER_LETSENCRYPT_HOST=                   # Same as above for prod, empty for local
+PORTAINER_PASSWORD_HASH=<CHANGE_ME>          # Generate with: htpasswd -nbB admin 'password' | cut -d: -f2
 
-#Max memory for elasticsearch process. Need to be high in prod (>10)
-ELASTICSEARCH_MEM_IN_MB=1000
+# ===========================================
+# ELASTICSEARCH (Full-text search)
+# ===========================================
+ELASTICSEARCH_MEM_IN_MB=1000                  # Memory limit (use >10000 for prod)
+ELASTICSEARCH_PASSWORD=<CHANGE_ME>           # Password for elastic user
 
-#Password used to encrypt the backup
-BACKUP_PASSWORD=very secure password
-#Target (S3 bucket) where the backup should be saved to (duplicity option)
-BACKUP_TARGET=s3://s3.eu-central-1.amazonaws.com/oberfeld
-#The accessKey ID for the user that has write access to the S3 Bucket (duplicity option)
-BACKUP_AWS_ACCESS_KEY_ID=<YOUR ACCESS KEY ID>
-#The accessKey secret for the user that has write access to the S3 Bucket (duplicity option)
-BACKUP_AWS_SECRET_ACCESS_KEY=<YOUR ACCESS KEY>
-
+# ===========================================
+# BACKUP (S3)
+# ===========================================
+BACKUP_PASSWORD=<CHANGE_ME>                  # GPG encryption passphrase for backups
+BACKUP_AWS_ACCESS_KEY_ID=<CHANGE_ME>         # AWS access key ID
+BACKUP_AWS_SECRET_ACCESS_KEY=<CHANGE_ME>     # AWS secret access key
+# Note: S3 bucket name is configured in docker-compose-backup.yml (default: oberfeld)
 ```
-### Auth keys for Backup
-The SSH key that are used to authenticate the user at the backup target host
-need to placed in `./keys/id_rsa`.
-You can use the command
-```bash
-$> mkdir keys && ssh-keygen -f keys/id_rsa -N ""
-``` 
-Then copy the content of the file `./keys/id_rsa.pub` to the backup-target's file `.ssh/authorized_keys`.
 
 ### Plugins for Nextcloud
 Install the following Apps in nextcloud
@@ -117,11 +123,11 @@ After Installation / Updates, readd our custom NextCloud configuration:
 
 
 ## Backup for S3
-The database and the nextcloud files (data and code) are backed up (volumes `db`und `nextcloud`).
+The database and the nextcloud files (data and code) are backed up (volumes `db` and `nextcloud`).
 This is done by the container `volumerize`. 
 
 ### Setup
-The backup enpoint is an S3 bucket. 
+The backup endpoint is an S3 bucket. 
 
 To set up an S3 Bucket, I (@inthemill) have done the following:
 - Create an account `oberfeld-it`
