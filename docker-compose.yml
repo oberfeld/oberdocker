@@ -55,6 +55,28 @@ services:
     depends_on:
       - db
 
+  eml-converter:
+    build: ./eml-converter
+    restart: unless-stopped
+    volumes:
+      - nextcloud:/var/www/html:z
+    environment:
+      - DATA_DIR=/var/www/html/data
+    depends_on:
+      - nextcloud
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '1.0'      
+
   collabora:
     image: collabora/code
     container_name: collabora
