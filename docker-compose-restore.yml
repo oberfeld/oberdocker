@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   restore:
-    build: ./volumerize
+    image: blacklabelops/volumerize:1.7.1
     container_name: restore
     environment:
       - VOLUMERIZE_SOURCE=/source
@@ -12,8 +12,14 @@ services:
       - TZ=Europe/Berlin
       - AWS_ACCESS_KEY_ID=    ${BACKUP_AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${BACKUP_AWS_SECRET_ACCESS_KEY}
-      - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive-
+      - VOLUMERIZE_DUPLICITY_OPTIONS=--file-prefix-archive=archive- --verbosity=INFO --s3-use-new-style --s3-multipart-chunk-size 50
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - db:/source/db  
-      - nextcloud:/source/nextcloud
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      - type: volume
+        source: db
+        target: /source/db
+      - type: volume
+        source: nextcloud
+        target: /source/nextcloud
