@@ -19,7 +19,7 @@ services:
       - MYSQL_PASSWORD
       - MARIADB_AUTO_UPGRADE=1
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 30s
       timeout: 10s
       retries: 5
