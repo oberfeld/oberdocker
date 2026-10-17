@@ -1,6 +1,7 @@
 services:
   db:
     image: mariadb:lts
+    user: mysql
     command: 
       --transaction-isolation=READ-COMMITTED
       --binlog-format=ROW
