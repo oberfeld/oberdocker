@@ -9,7 +9,7 @@ services:
       --long-query-time=2
       --log-output=FILE
       --slow-query-log-file=/dev/stdout
-      -- innodb-log-file-size=128M
+      --innodb-log-file-size=128M
     restart: unless-stopped
     volumes:
       - db:/var/lib/mysql
