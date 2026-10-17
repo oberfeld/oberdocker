@@ -1,7 +1,13 @@
 services:
   db:
     image: mariadb:lts
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    command: 
+      --transaction-isolation=READ-COMMITTED
+      --binlog-format=ROW
+      --slow-query-log=ON
+      --long-query-time=2
+      --log-output=FILE
+      --slow-query-log-file=/dev/stdout
     restart: unless-stopped
     volumes:
       - db:/var/lib/mysql
